@@ -69,17 +69,17 @@ public class DocumentController {
     }
   }
 
-  @DeleteMapping("deleteFile")
+  @DeleteMapping("/deleteFile")
   public ResponseEntity<Resource> deleteFile(
-      @RequestParam("userId") Integer UserId,
+      @RequestParam("userId") String UserId,
       @RequestParam("docType") String docType,
       HttpServletRequest request) {
-    String fileName = documneStorageService.getDocumentName(UserId, docType);
+    String fileName = documneStorageService.getDocumentName(Integer.valueOf(UserId), docType);
 
     if (fileName == null) {
       return ResponseEntity.notFound().build();
     }
-    documneStorageService.deleteFile(UserId, docType);
+    documneStorageService.deleteFile(Integer.valueOf(UserId), docType);
     return ResponseEntity.ok().build();
   }
 
