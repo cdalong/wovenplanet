@@ -15,13 +15,13 @@ import java.util.List;
 
 @RestController
 public class DocumentController {
-  @Autowired private DocumentService documneStorageService;
+  @Autowired private DocumentService documentService;
   @PostMapping("/uploadFile")
   public UploadFileResponse uploadFile(
       @RequestParam("file") MultipartFile file,
       @RequestParam("userId") Integer UserId,
       @RequestParam("docType") String docType) {
-    String fileName = documneStorageService.storeFile(file, UserId, docType);
+    String fileName = documentService.storeFile(file, UserId, docType);
     String fileDownloadUri =
         UriComponentsBuilder.fromPath("/downloadFile/" + fileName).toUriString();
     return new UploadFileResponse(fileName, fileDownloadUri, file.getContentType(), file.getSize());
@@ -32,11 +32,11 @@ public class DocumentController {
       @RequestParam("userId") Integer userId,
       @RequestParam("docType") String docType,
       HttpServletRequest request) {
-    String fileName = documneStorageService.getDocumentName(userId, docType);
+    String fileName = documentService.getDocumentName(userId, docType);
     Resource resource = null;
     if (fileName != null && !fileName.isEmpty()) {
       try {
-        resource = documneStorageService.loadFileAsResource(fileName);
+        resource = documentService.loadFileAsResource(fileName);
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -69,24 +69,24 @@ public class DocumentController {
     }
   }
 
-  @DeleteMapping("deleteFile")
+  @DeleteMapping("/deleteFile")
   public ResponseEntity<Resource> deleteFile(
-      @RequestParam("userId") Integer UserId,
+      @RequestParam("userId") String UserId,
       @RequestParam("docType") String docType,
       HttpServletRequest request) {
-    String fileName = documneStorageService.getDocumentName(UserId, docType);
+    String fileName = documentService.getDocumentName(Integer.valueOf(UserId), docType);
 
     if (fileName == null) {
       return ResponseEntity.notFound().build();
     }
-    documneStorageService.deleteFile(UserId, docType);
+    documentService.deleteFile(Integer.valueOf(UserId), docType);
     return ResponseEntity.ok().build();
   }
 
   @GetMapping("listFiles")
   public ListFilesResponse listFiles(HttpServletRequest request)
   {
-    List<DocumentProperties> response = documneStorageService.getFiles();
+    List<DocumentProperties> response = documentService.getFiles();
 
     if (response.isEmpty())
     {
